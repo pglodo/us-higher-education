@@ -106,17 +106,40 @@
 		tiles.addTo(map);
 
 		$.getJSON("data/us_public_schools.geojson", function(data) {
+			data.features.sort(function(a,b) {
+				return (Number(b.properties.act_mid) / Number(b.properties.cost)) - (Number(a.properties.act_mid) / Number(a.properties.cost));
+			}); // sorting features so that larger values are displayed on the bottom
+
       var dataLayer = L.geoJson(data, {
-        style: function(feature) {
-          return {
-            color: '#dddddd',
-            weight: 1,
-            fillOpacity: 1,
-            fillColor: '#1f78b4'
-          };
-        }
+        pointToLayer: function(feature, latlng) {
+          return L.circleMarker(latlng, {
+						color: '#613f77',
+						weight: 1,
+						fillColor: '#9274a5',
+						fillOpacity: 0.8,
+						radius: Number(feature.properties.act_mid) / Number(feature.properties.cost) * 10000
+					});
+        },
+				filter: function(feature) {
+					if(feature.properties.cost != 'NULL') { //removing one feature that doesn't have cost data
+						return feature;
+					}
+				},
+				onEachFeature: function(feature, layer) {
+					//building popups for each layer
+					var tooltip = "<b>" + feature.properties.name + ", " +
+							feature.properties.us_state + "</b><br>" +
+						"<b>URL: </b><a href='" + feature.properties.url + "'>" +
+							feature.properties.url + "</a><br>" +
+						"<b>Average Annual Cost: </b>$" + Number(feature.properties.cost).toLocaleString() + "<br>" +
+						"<b>Composite ACT Scores:</b><br><ul>" +
+						"<li><b>25th Percentile: </b>" + feature.properties.act_25 + "</li>" +
+						"<li><b>Mid: </b>" + feature.properties.act_mid + "</li>" +
+						"<li><b>75th Percentile: </b>" + feature.properties.act_75 + "</li></ul>";
+					layer.bindPopup(tooltip);
+				}
       }).addTo(map);
-    });
+		});
 
 	</script>
 
