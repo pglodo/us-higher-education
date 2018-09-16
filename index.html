@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset=utf-8 />
-	<title>Full map width template</title>
+	<title>US Public Education</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" />
@@ -73,15 +73,17 @@
 
 <body>
 
-	<h1>Awesome Map Title</h1>
+	<h1>Public Education in the United States</h1>
 
 	<div id='map'></div>
 
 	<section id="about">
-		<h2>about this map</h2>
-		<p>Additional information about <a href="#">the data</a> and map goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus.
+		<h2>Information</h2>
+		<p>All data downloaded from <a href="https://collegescorecard.ed.gov/data/">U.S. Department of Education</a>'s College Scoreacard Dataset. The data was refined and converted to GeoJSON using QGIS 2.18.19.
 		</p>
-		<p>Map authored by me, MY NAME</p>
+		<p>The data includes Composite ACT scores of the 25th and 75th percentiles, as well as a mid value between the two. Using this mid Composite ACT score as a metric for value (better schools tend to accept higher performing students), I created a ratio between this value and the schools' reported Average Annual Cost. This created a very small number, so I then magnified the value to properly show the different relationships on the map. There are obviously other factors at play when it comes to school value and expense, but this map was merely meant to examine this very basic relationship between ACT Scores of students and tution expense.
+		</p>
+		<p>Map authored by Phillip Glodowski</p>
 	</section>
 
 	<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
