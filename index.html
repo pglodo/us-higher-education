@@ -137,6 +137,21 @@
 						"<li><b>Mid: </b>" + feature.properties.act_mid + "</li>" +
 						"<li><b>75th Percentile: </b>" + feature.properties.act_75 + "</li></ul>";
 					layer.bindPopup(tooltip);
+
+					// add ui feedback when hovering over points
+					layer.on('mouseover', function() {
+						layer.setStyle({
+							color: '#ef9847',
+							fillColor: '#efc847'
+						});
+					});
+					layer.on('mouseout', function() {
+						layer.setStyle({
+							color: '#613f77',
+							fillColor: '#9274a5'
+						});
+					});
+
 				}
       }).addTo(map);
 		});
