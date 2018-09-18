@@ -39,6 +39,12 @@
 			letter-spacing: .04em;
 		}
 
+		h3 {
+			font-family: 'Patua One';
+			color: #3a5e96;
+			letter-spacing: .02em;
+		}
+
 		#map {
 			position: absolute;
 			top: 0;
@@ -84,9 +90,9 @@
 
 	<section id="about">
 		<h2>Information</h2>
-		<p>All data downloaded from <a href="https://collegescorecard.ed.gov/data/">U.S. Department of Education</a>'s College Scoreacard Dataset. The data was refined and converted to GeoJSON using QGIS 2.18.19.
+		<p>All data downloaded from <a href="https://collegescorecard.ed.gov/data/" target="blank">U.S. Department of Education</a>'s College Scoreacard Dataset. The data was refined and converted to GeoJSON using QGIS 2.18.19.
 		</p>
-		<p>All data is from the 2017-2018 student cohort. It includes Composite ACT scores of the 25th and 75th percentiles, as well as a mid value between the two. Using this mid Composite ACT score as a metric for value (better schools tend to accept higher performing students), I created a ratio between this value and the schools' reported Average Annual Cost. This created a very small number, so I then magnified the value to properly show the different relationships on the map. There are obviously other factors at play when it comes to school value and expense, but this map was merely meant to examine this very basic relationship between ACT Scores of students and tution expense.
+		<p>All data is from the 2017-2018 student cohort. It includes Composite ACT scores of the 25th and 75th percentiles, as well as a mid value between the two. Using this mid Composite ACT score as a metric for value (better schools tend to accept higher performing students), I created a ratio between this value and the schools' reported Average Annual Cost so that larger numbers reflect greater value. However, this created a very small number, so I then magnified the value to properly show the different relationships on the map. There are obviously other factors at play when it comes to school value and expense, but this map was merely meant to examine this very basic relationship between ACT Scores of students and tution expense.
 		</p>
 		<p>Map authored by Phillip Glodowski</p>
 	</section>
@@ -111,8 +117,6 @@
 		});
 
 		tiles.addTo(map);
-
-
 
 		$.getJSON("data/us_schools.geojson", function(data) {
 			data.features.sort(function(a,b) {
@@ -205,8 +209,8 @@
 
 		// function to build the same tooltip for each layer
 		function getTooltip(feature, layer) {
-			return "<b>" + feature.properties.name + ", " +
-					feature.properties.us_state + "</b><br>" +
+			return "<h3>" + feature.properties.name + ", " +
+					feature.properties.us_state + "</h3>" +
 				"<b>URL: </b><a href='" + feature.properties.url + "'>" +
 					feature.properties.url + "</a><br>" +
 				"<b>Average Annual Cost: </b>$" + Number(feature.properties.cost).toLocaleString() + "<br><b>New Undergrad Population: </b>" +
@@ -214,7 +218,8 @@
 				"<b>Composite ACT Scores:</b><br><ul>" +
 				"<li><b>25th Percentile: </b>" + feature.properties.act_25 + "</li>" +
 				"<li><b>Mid: </b>" + feature.properties.act_mid + "</li>" +
-				"<li><b>75th Percentile: </b>" + feature.properties.act_75 + "</li></ul>";
+				"<li><b>75th Percentile: </b>" + feature.properties.act_75 + "</li></ul>" +
+				"<br><b>Value Score: </b>" + (Number(feature.properties.act_mid) / Number(feature.properties.cost) * 10000).toLocaleString();
 		}
 
 	</script>
