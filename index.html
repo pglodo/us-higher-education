@@ -27,7 +27,7 @@
 			font-family: 'Patua One';
 			letter-spacing: .06em;
 			padding: 10px 15px;
-			background: rgba(256, 256, 256, .4);
+			background: rgba(256, 256, 256, .8);
 			border: 1px solid grey;
 			border-radius: 3px;
 			z-index: 800;
@@ -45,6 +45,10 @@
 			letter-spacing: .02em;
 		}
 
+		li {
+			margin-left: -10px;
+		}
+
 		#map {
 			position: absolute;
 			top: 0;
@@ -58,7 +62,7 @@
 			left: 15px;
 			width: 280px;
 			padding: 0 15px;
-			background: rgba(256, 256, 256, .4);
+			background: rgba(256, 256, 256, .8);
 			border: 1px solid grey;
 			border-radius: 3px;
 			z-index: 800;
@@ -79,6 +83,7 @@
 		a:hover {
 			text-decoration: underline;
 		}
+
 	</style>
 </head>
 
@@ -92,7 +97,10 @@
 		<h2>Information</h2>
 		<p>All data downloaded from <a href="https://collegescorecard.ed.gov/data/" target="blank">U.S. Department of Education</a>'s College Scoreacard Dataset. The data was refined and converted to GeoJSON using QGIS 2.18.19.
 		</p>
-		<p>All data is from the 2017-2018 student cohort. It includes Composite ACT scores of the 25th and 75th percentiles, as well as a mid value between the two. Using this mid Composite ACT score as a metric for value (better schools tend to accept higher performing students), I created a ratio between this value and the schools' reported Average Annual Cost so that larger numbers reflect greater value. However, this created a very small number, so I then magnified the value to properly show the different relationships on the map. There are obviously other factors at play when it comes to school value and expense, but this map was merely meant to examine this very basic relationship between ACT Scores of students and tution expense.
+		<p>All data is from the 2017-2018 student cohort. It includes Composite ACT scores of the 25th and 75th percentiles, as well as a mid value between the two. Using this mid Composite ACT score as a metric for value (better schools tend to accept
+			higher performing students), I created a ratio between this value and the schools' reported Average Annual Cost so that larger numbers reflect greater value. However, this created a very small number, so I then magnified the value to properly
+			show the different relationships on the map. There are obviously other factors at play when it comes to school value and expense, but this map was merely meant to examine this very basic relationship between ACT Scores of students and tution
+			expense.
 		</p>
 		<p>Map authored by Phillip Glodowski</p>
 	</section>
@@ -119,23 +127,23 @@
 		tiles.addTo(map);
 
 		$.getJSON("data/us_schools.geojson", function(data) {
-			data.features.sort(function(a,b) {
+			data.features.sort(function(a, b) {
 				return (Number(b.properties.act_mid) / Number(b.properties.cost)) - (Number(a.properties.act_mid) / Number(a.properties.cost));
 			}); // sorting features so that larger values are displayed on the bottom
 
 			//PUBLIC SCHOOLS
-      var publicLayer = L.geoJson(data, {
-        pointToLayer: function(feature, latlng) {
-          return L.circleMarker(latlng, {
+			var publicLayer = L.geoJson(data, {
+				pointToLayer: function(feature, latlng) {
+					return L.circleMarker(latlng, {
 						color: '#613f77',
 						weight: 1,
 						fillColor: '#9274a5',
 						fillOpacity: 0.8,
-						radius: Number(feature.properties.act_mid) / Number(feature.properties.cost) * 10000
+						radius: calcRadius(Number(feature.properties.act_mid), Number(feature.properties.cost))
 					});
-        },
+				},
 				filter: function(feature) {
-					if(feature.properties.cost != 'NULL' && feature.properties.pub_np_priv == '1') { //removing one feature that doesn't have cost data
+					if (feature.properties.cost != 'NULL' && feature.properties.pub_np_priv == '1') { //removing one feature that doesn't have cost data
 						return feature;
 					}
 				},
@@ -158,21 +166,21 @@
 					});
 
 				}
-      }).addTo(map);
+			}).addTo(map);
 
 			//PRIVATE SCHOOLS
 			var privateLayer = L.geoJson(data, {
-        pointToLayer: function(feature, latlng) {
-          return L.circleMarker(latlng, {
+				pointToLayer: function(feature, latlng) {
+					return L.circleMarker(latlng, {
 						color: '#3a5e96',
 						weight: 1,
 						fillColor: '#5583cc',
 						fillOpacity: 0.8,
-						radius: Number(feature.properties.act_mid) / Number(feature.properties.cost) * 10000
+						radius: calcRadius(Number(feature.properties.act_mid), Number(feature.properties.cost))
 					});
-        },
+				},
 				filter: function(feature) {
-					if(feature.properties.cost != 'NULL' && feature.properties.pub_np_priv != '1') { //removing one feature that doesn't have cost data
+					if (feature.properties.cost != 'NULL' && feature.properties.pub_np_priv != '1') { //removing one feature that doesn't have cost data
 						return feature;
 					}
 				},
@@ -195,24 +203,26 @@
 					});
 
 				}
-      }).addTo(map);
+			}).addTo(map);
 
 			// building a toggle option
 			var sourcesLayers = {
-				"<b style='color:#613f77; text-shadow: 0px 1px 1px #333'>Public Schools</b>": publicLayer,
-				"<b style='color:#3a5e96; text-shadow: 0px 1px 1px #333'>Private Schools</b>": privateLayer
+				"<b style='color:#613f77'>Public Schools</b>": publicLayer,
+				"<b style='color:#3a5e96'>Private Schools</b>": privateLayer
 			}
 
-			L.control.layers(null, sourcesLayers, { collapsed:false }).addTo(map);
+			L.control.layers(null, sourcesLayers, {
+				collapsed: false
+			}).addTo(map);
 
 		});
 
 		// function to build the same tooltip for each layer
 		function getTooltip(feature, layer) {
 			return "<h3>" + feature.properties.name + ", " +
-					feature.properties.us_state + "</h3>" +
+				feature.properties.us_state + "</h3>" +
 				"<b>URL: </b><a href='http://" + feature.properties.url + "' target='blank'>" +
-					feature.properties.url + "</a><br>" +
+				feature.properties.url + "</a><br>" +
 				"<b>Average Annual Cost: </b>$" + Number(feature.properties.cost).toLocaleString() + "<br><b>New Undergrad Population: </b>" +
 				Number(feature.properties.ug_pop).toLocaleString() + "<br>" +
 				"<b>Composite ACT Scores:</b><br><ul>" +
@@ -220,6 +230,11 @@
 				"<li><b>Mid: </b>" + feature.properties.act_mid + "</li>" +
 				"<li><b>75th Percentile: </b>" + feature.properties.act_75 + "</li></ul>" +
 				"<br><b>Value Score: </b>" + (Number(feature.properties.act_mid) / Number(feature.properties.cost) * 10000).toLocaleString();
+		}
+
+		function calcRadius(val1, val2) {
+			var radius = (val1 / val2) * 10000;
+			return radius;
 		}
 
 	</script>
