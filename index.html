@@ -211,7 +211,7 @@
 		function getTooltip(feature, layer) {
 			return "<h3>" + feature.properties.name + ", " +
 					feature.properties.us_state + "</h3>" +
-				"<b>URL: </b><a href='" + feature.properties.url + "'>" +
+				"<b>URL: </b><a href='http://" + feature.properties.url + "' target='blank'>" +
 					feature.properties.url + "</a><br>" +
 				"<b>Average Annual Cost: </b>$" + Number(feature.properties.cost).toLocaleString() + "<br><b>New Undergrad Population: </b>" +
 				Number(feature.properties.ug_pop).toLocaleString() + "<br>" +
